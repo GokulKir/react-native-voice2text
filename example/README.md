@@ -5,7 +5,7 @@
 ✅ **Compatible with React Native 0.70+**  
 🚧 **iOS support in development**
 
-![React Native Speech to Text](https://blog.logrocket.com/wp-content/uploads/2022/12/build-a-react-native-speech-to-text-dictation-app-nocdn.png)  
+![React Native Speech to Text](https://blog.logrocket.com/wp-content/uploads/2022/12/build-a-react-native-speech-to-text-dictation-app-nocdn.png)
 
 ---
 
@@ -35,6 +35,7 @@ For **React Native >= 0.60**, autolinking handles the setup automatically. For o
 #### Manual Linking
 
 ##### a) Update `android/settings.gradle`
+
 Add the following to include the module:
 
 ```gradle
@@ -43,6 +44,7 @@ project(':react-native-voice2text').projectDir = new File(rootProject.projectDir
 ```
 
 ##### b) Update `android/app/build.gradle`
+
 Add the module as a dependency:
 
 ```gradle
@@ -52,6 +54,7 @@ dependencies {
 ```
 
 ##### c) Update `MainApplication.java`
+
 Open `android/app/src/main/java/<your-package>/MainApplication.java` and add the `Voice2TextPackage`:
 
 ```java
@@ -99,12 +102,12 @@ async function startRecognition() {
 }
 
 // Listen for recognized text
-Voice2Text.onResults(result => {
+Voice2Text.onResults((result) => {
   console.log('Recognized Text:', result.text);
 });
 
 // Handle errors
-Voice2Text.onError(error => {
+Voice2Text.onError((error) => {
   console.error('Recognition Error:', error.message);
 });
 
@@ -116,13 +119,13 @@ Voice2Text.stopListening();
 
 ## 🧪 API Reference
 
-| Method | Description |
-| --- | --- |
-| `checkPermissions(): Promise<boolean>` | Checks and requests microphone permission. |
-| `startListening(locale: string)` | Starts voice recognition with the specified locale (e.g., `'en-US'`). |
-| `stopListening()` | Stops the active voice recognition session. |
-| `onResults(callback: (result: { text: string }) => void)` | Subscribes to recognition result events. |
-| `onError(callback: (error: { message: string }) => void)` | Subscribes to error events. |
+| Method                                                    | Description                                                           |
+| --------------------------------------------------------- | --------------------------------------------------------------------- |
+| `checkPermissions(): Promise<boolean>`                    | Checks and requests microphone permission.                            |
+| `startListening(locale: string)`                          | Starts voice recognition with the specified locale (e.g., `'en-US'`). |
+| `stopListening()`                                         | Stops the active voice recognition session.                           |
+| `onResults(callback: (result: { text: string }) => void)` | Subscribes to recognition result events.                              |
+| `onError(callback: (error: { message: string }) => void)` | Subscribes to error events.                                           |
 
 ---
 
