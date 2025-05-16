@@ -1,97 +1,167 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# 🎙️ react-native-voice2text
 
-# Getting Started
+**react-native-voice2text** is a lightweight, modern, and easy-to-use React Native native module for **Android** that transforms spoken words into text using the device's built-in speech recognition services. Perfect for adding voice commands, accessibility features, or hands-free inputs to your app with a clean and intuitive API.
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+✅ **Compatible with React Native 0.70+**  
+🚧 **iOS support in development**
 
-## Step 1: Start Metro
+![React Native Speech to Text](https://blog.logrocket.com/wp-content/uploads/2022/12/build-a-react-native-speech-to-text-dictation-app-nocdn.png)  
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+---
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+## 🌟 Features
 
-```sh
-# Using npm
-npm start
+- 🎤 **Seamless Voice-to-Text**: Leverage native Android speech recognition APIs.
+- 🔄 **Real-Time Results**: Stream recognition results as users speak.
+- 🚫 **Robust Error Handling**: Gracefully handle errors and edge cases.
+- 🔐 **Permission Management**: Built-in checks for microphone access.
 
-# OR using Yarn
-yarn start
+---
+
+## 📦 Installation
+
+### 1. Install the Package
+
+```bash
+npm install react-native-voice2text
+# or
+yarn add react-native-voice2text
 ```
 
-## Step 2: Build and run your app
+### 2. Native Android Setup
 
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
+For **React Native >= 0.60**, autolinking handles the setup automatically. For older versions or if autolinking fails, follow the manual linking steps below.
 
-### Android
+#### Manual Linking
 
-```sh
-# Using npm
-npm run android
+##### a) Update `android/settings.gradle`
+Add the following to include the module:
 
-# OR using Yarn
-yarn android
+```gradle
+include ':react-native-voice2text'
+project(':react-native-voice2text').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-voice2text/android')
 ```
 
-### iOS
+##### b) Update `android/app/build.gradle`
+Add the module as a dependency:
 
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
-
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
-
-```sh
-bundle install
+```gradle
+dependencies {
+    implementation project(':react-native-voice2text')
+}
 ```
 
-Then, and every time you update your native dependencies, run:
+##### c) Update `MainApplication.java`
+Open `android/app/src/main/java/<your-package>/MainApplication.java` and add the `Voice2TextPackage`:
 
-```sh
-bundle exec pod install
+```java
+import com.voice2text.Voice2TextPackage;
+
+@Override
+protected List<ReactPackage> getPackages() {
+  return Arrays.<ReactPackage>asList(
+    new MainReactPackage(),
+    new Voice2TextPackage() // Add this
+  );
+}
 ```
 
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
+### 3. Add Permissions
 
-```sh
-# Using npm
-npm run ios
+Ensure the following permissions are included in `android/app/src/main/AndroidManifest.xml`:
 
-# OR using Yarn
-yarn ios
+```xml
+<uses-permission android:name="android.permission.RECORD_AUDIO" />
+<uses-permission android:name="android.permission.INTERNET" />
 ```
 
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
+---
 
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
+## 📱 Usage Example
 
-## Step 3: Modify your app
+Here's a quick example to get you started with voice recognition:
 
-Now that you have successfully run the app, let's make changes!
+```javascript
+import Voice2Text from 'react-native-voice2text';
 
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
+async function startRecognition() {
+  try {
+    const granted = await Voice2Text.checkPermissions();
+    if (granted) {
+      Voice2Text.startListening('en-US');
+    } else {
+      console.warn('Microphone permission denied');
+      // Prompt user to enable permissions
+    }
+  } catch (error) {
+    console.error('Permission error:', error);
+  }
+}
 
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
+// Listen for recognized text
+Voice2Text.onResults(result => {
+  console.log('Recognized Text:', result.text);
+});
 
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
+// Handle errors
+Voice2Text.onError(error => {
+  console.error('Recognition Error:', error.message);
+});
 
-## Congratulations! :tada:
+// Stop listening
+Voice2Text.stopListening();
+```
 
-You've successfully run and modified your React Native App. :partying_face:
+---
 
-### Now what?
+## 🧪 API Reference
 
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
+| Method | Description |
+| --- | --- |
+| `checkPermissions(): Promise<boolean>` | Checks and requests microphone permission. |
+| `startListening(locale: string)` | Starts voice recognition with the specified locale (e.g., `'en-US'`). |
+| `stopListening()` | Stops the active voice recognition session. |
+| `onResults(callback: (result: { text: string }) => void)` | Subscribes to recognition result events. |
+| `onError(callback: (error: { message: string }) => void)` | Subscribes to error events. |
 
-# Troubleshooting
+---
 
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
+## 📂 Folder Structure (Android)
 
-# Learn More
+Ensure your native files are organized as follows:
 
-To learn more about React Native, take a look at the following resources:
+```
+android/app/src/main/java/com/<your-app>/voice2text/
+├── Voice2TextModule.java
+└── Voice2TextPackage.java
+```
 
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+---
+
+## 🧠 Important Notes
+
+- **Android Only**: iOS support is under development.
+- **Google Speech Services**: Ensure your emulator or device has Google Speech Services installed and active.
+- **Internet Connection**: Voice recognition typically requires an active internet connection.
+
+---
+
+## 🚀 Roadmap
+
+- [x] Android support
+- [ ] iOS implementation
+- [ ] Continuous recognition (streaming)
+- [ ] Dynamic language switching
+- [ ] Offline recognition support
+
+---
+
+## 👨‍💻 Author
+
+Maintained by [Gokulkrishna](https://github.com/GokulKir)
+
+---
+
+## 📄 License
+
+MIT © 2025
