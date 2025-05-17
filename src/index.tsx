@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import {
   NativeModules,
   NativeEventEmitter,
@@ -40,7 +39,8 @@ const Voice2TextModule = {
         PermissionsAndroid.PERMISSIONS.RECORD_AUDIO
       );
     }
-    return false;
+    // iOS permissions handled by native side or not required here
+    return true;
   },
 
   async requestPermissions(): Promise<boolean> {
@@ -50,16 +50,16 @@ const Voice2TextModule = {
       );
       return result === PermissionsAndroid.RESULTS.GRANTED;
     }
-    return false;
+    return true;
   },
 
-  async startListening(languageCode?: string): Promise<boolean> {
+  async startListening(languageCode?: string | null): Promise<boolean> {
     const hasPermission = await this.checkPermissions();
     if (!hasPermission) {
       const granted = await this.requestPermissions();
       if (!granted) throw new Error('Permission not granted');
     }
-    return await Voice2Text.startListening(languageCode || null);
+    return Voice2Text.startListening(languageCode ?? null);
   },
 
   stopListening(): Promise<boolean> {
@@ -75,35 +75,12 @@ const Voice2TextModule = {
   },
 
   onResults(callback: SpeechResultsCallback): () => void {
-=======
-import { NativeModules, NativeEventEmitter } from 'react-native';
-
-const { Voice2Text } = NativeModules;
-
-const eventEmitter = new NativeEventEmitter(Voice2Text);
-
-export default {
-  checkPermissions: (): Promise<boolean> => Voice2Text.checkPermissions(),
-
-  startListening: (languageCode: string): void =>
-    Voice2Text.startListening(languageCode),
-
-  stopListening: (): void => Voice2Text.stopListening(),
-
-  destroy: (): void => Voice2Text.destroy(),
-
-  onResults: (callback: (results: any) => void): (() => void) => {
->>>>>>> 653118c (chore: initial commit)
     const subscription = eventEmitter.addListener('onSpeechResults', callback);
     return () => subscription.remove();
   },
 
-<<<<<<< HEAD
   onPartialResults(callback: SpeechResultsCallback): () => void {
-    const subscription = eventEmitter.addListener(
-      'onSpeechPartialResults',
-      callback
-    );
+    const subscription = eventEmitter.addListener('onSpeechPartialResults', callback);
     return () => subscription.remove();
   },
 
@@ -128,19 +105,9 @@ export default {
   },
 
   onVolumeChanged(callback: VolumeChangedCallback): () => void {
-    const subscription = eventEmitter.addListener(
-      'onSpeechVolumeChanged',
-      callback
-    );
+    const subscription = eventEmitter.addListener('onSpeechVolumeChanged', callback);
     return () => subscription.remove();
   },
 };
 
 export default Voice2TextModule;
-=======
-  onError: (callback: (error: any) => void): (() => void) => {
-    const subscription = eventEmitter.addListener('onSpeechError', callback);
-    return () => subscription.remove();
-  },
-};
->>>>>>> 653118c (chore: initial commit)
