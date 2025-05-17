@@ -64,9 +64,12 @@ const Voice2TextModule: Voice2TextModuleInterface = {
           PermissionsAndroid.PERMISSIONS.RECORD_AUDIO
         );
         return hasPermission;
+      } else if (Platform.OS === 'ios') {
+        console.warn('iOS permission checking not implemented yet');
+        // TODO: Implement iOS permission check (e.g., using react-native-permissions)
+        return false;
       }
-      // iOS implementation
-      return await Voice2Text.checkPermissions();
+      return false;
     } catch (error) {
       console.error('Error checking permissions:', error);
       return false;
@@ -80,9 +83,12 @@ const Voice2TextModule: Voice2TextModuleInterface = {
           PermissionsAndroid.PERMISSIONS.RECORD_AUDIO
         );
         return result === PermissionsAndroid.RESULTS.GRANTED;
+      } else if (Platform.OS === 'ios') {
+        console.warn('iOS permission request not implemented yet');
+        // TODO: Implement iOS permission request (e.g., using react-native-permissions)
+        return false;
       }
-      // iOS implementation
-      return await Voice2Text.requestPermissions();
+      return false;
     } catch (error) {
       console.error('Error requesting permissions:', error);
       return false;

@@ -1,7 +1,7 @@
 import type { TurboModule } from 'react-native';
 import { TurboModuleRegistry } from 'react-native';
 
-export interface Voice2TextSpec extends TurboModule {
+export interface Spec extends TurboModule {
   checkPermissions(): Promise<boolean>;
   requestPermissions(): Promise<boolean>;
   startListening(languageCode: string | null): Promise<boolean>;
@@ -10,4 +10,4 @@ export interface Voice2TextSpec extends TurboModule {
   destroy(): Promise<boolean>;
 }
 
-export default TurboModuleRegistry.getEnforcing<Voice2TextSpec>('Voice2Text');
+export default TurboModuleRegistry.getEnforcing<Spec>('Voice2Text');

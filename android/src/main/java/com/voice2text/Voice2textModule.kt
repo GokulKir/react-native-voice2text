@@ -39,7 +39,7 @@ class Voice2TextModule(reactContext: ReactApplicationContext) :
     private fun sendEvent(eventName: String, params: WritableMap?) {
         if (isDestroyed) return
         reactApplicationContext
- .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
+            .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
             .emit(eventName, params)
     }
 
