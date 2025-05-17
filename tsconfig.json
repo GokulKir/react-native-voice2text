@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "rootDir": ".",
+    "baseUrl": ".",
     "paths": {
       "react-native-voice2text": ["./src/index"]
     },
@@ -9,9 +10,9 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "jsx": "react-jsx",
-    "lib": ["ESNext"],
+    "lib": ["ESNext", "DOM"],
     "module": "ESNext",
-    "moduleResolution": "bundler",
+    "moduleResolution": "node",
     "noEmit": true,
     "noFallthroughCasesInSwitch": true,
     "noImplicitReturns": true,
@@ -24,6 +25,18 @@
     "skipLibCheck": true,
     "strict": true,
     "target": "ESNext",
-    "verbatimModuleSyntax": true
-  }
+    "verbatimModuleSyntax": true,
+    "types": ["react", "react-native", "jest"],        // important to add test types
+    "allowJs": true
+  },
+  "include": [
+    "src",                 // your source files
+    "src/__tests__/**/*"   // include test files for building type defs
+  ],
+  "exclude": [
+    "node_modules",
+    "android",
+    "ios",
+    "lib"
+  ]
 }

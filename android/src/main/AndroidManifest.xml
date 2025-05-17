@@ -1,6 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-<<<<<<< HEAD
     <!-- Required Permissions -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -14,16 +13,3 @@
 
     <application />
 </manifest>
-=======
-    <!-- Permission to record audio -->
-    <uses-permission android:name="android.permission.RECORD_AUDIO" />
-    <uses-permission android:name="android.permission.INTERNET"/>
-
-
-    <!-- Required inside manifest, even if empty -->
-    <application>
-        <!-- Your app components go here, e.g. activities -->
-    </application>
-
-</manifest>
->>>>>>> 653118c (chore: initial commit)

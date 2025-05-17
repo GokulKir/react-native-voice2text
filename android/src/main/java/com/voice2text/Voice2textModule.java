@@ -3,22 +3,34 @@ package com.voice2text;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.os.*;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 
+import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 
-import com.facebook.react.bridge.*;
+import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.Promise;
+import com.facebook.react.bridge.ReactApplicationContext;
+import com.facebook.react.bridge.ReactContextBaseJavaModule;
+import com.facebook.react.bridge.ReactMethod;
+import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 
-import java.util.*;
+import java.util.List;
+import java.util.Locale;
 
 public class Voice2TextModule extends ReactContextBaseJavaModule implements RecognitionListener {
+
     private SpeechRecognizer speechRecognizer;
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
     private boolean isDestroyed = false;
+
+    private static final int REQUEST_RECORD_AUDIO_PERMISSION = 101;
 
     public Voice2TextModule(ReactApplicationContext reactContext) {
         super(reactContext);
@@ -71,7 +83,6 @@ public class Voice2TextModule extends ReactContextBaseJavaModule implements Reco
             promise.reject("NO_ACTIVITY", "No current activity");
             return;
         }
-
         ActivityCompat.requestPermissions(
             getCurrentActivity(),
             new String[]{Manifest.permission.RECORD_AUDIO},
@@ -102,7 +113,9 @@ public class Voice2TextModule extends ReactContextBaseJavaModule implements Reco
     public void stopListening(Promise promise) {
         mainHandler.post(() -> {
             try {
-                speechRecognizer.stopListening();
+                if (speechRecognizer != null) {
+                    speechRecognizer.stopListening();
+                }
                 promise.resolve(true);
             } catch (Exception e) {
                 promise.reject("STOP_FAILED", e.getMessage());
@@ -114,7 +127,9 @@ public class Voice2TextModule extends ReactContextBaseJavaModule implements Reco
     public void cancelListening(Promise promise) {
         mainHandler.post(() -> {
             try {
-                speechRecognizer.cancel();
+                if (speechRecognizer != null) {
+                    speechRecognizer.cancel();
+                }
                 promise.resolve(true);
             } catch (Exception e) {
                 promise.reject("CANCEL_FAILED", e.getMessage());
@@ -173,7 +188,7 @@ public class Voice2TextModule extends ReactContextBaseJavaModule implements Reco
     @Override
     public void onResults(Bundle results) {
         List<String> matches = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
-        if (matches != null) {
+        if (matches != null && !matches.isEmpty()) {
             WritableMap map = Arguments.createMap();
             map.putString("text", matches.get(0));
             map.putArray("alternatives", Arguments.fromList(matches));
@@ -184,7 +199,7 @@ public class Voice2TextModule extends ReactContextBaseJavaModule implements Reco
     @Override
     public void onPartialResults(Bundle partialResults) {
         List<String> partial = partialResults.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
-        if (partial != null) {
+        if (partial != null && !partial.isEmpty()) {
             WritableMap map = Arguments.createMap();
             map.putString("partialText", partial.get(0));
             map.putArray("alternatives", Arguments.fromList(partial));
@@ -192,8 +207,11 @@ public class Voice2TextModule extends ReactContextBaseJavaModule implements Reco
         }
     }
 
-    @Override public void onBufferReceived(byte[] buffer) {}
-    @Override public void onEvent(int eventType, Bundle params) {}
+    @Override
+    public void onBufferReceived(byte[] buffer) { }
+
+    @Override
+    public void onEvent(int eventType, Bundle params) { }
 
     private String getErrorMessage(int code) {
         switch (code) {
@@ -209,21 +227,4 @@ public class Voice2TextModule extends ReactContextBaseJavaModule implements Reco
             default: return "Unknown error";
         }
     }
-
-    @Override
-    public void onCatalystInstanceDestroy() {
-        destroy(new Promise() {
-            @Override public void resolve(Object value) {}
-            @Override public void reject(String code, String message) {}
-            @Override public void reject(String code, Throwable e) {}
-            @Override public void reject(String code, String message, Throwable e) {}
-            @Override public void reject(Throwable throwable) {}
-            @Override public void reject(Throwable throwable, WritableMap userInfo) {}
-            @Override public void reject(String code, @javax.annotation.Nullable WritableMap userInfo) {}
-            @Override public void reject(String code, String message, @javax.annotation.Nullable WritableMap userInfo) {}
-            @Override public void reject(String code, String message, Throwable throwable, WritableMap userInfo) {}
-        });
-    }
-
-    private static final int REQUEST_RECORD_AUDIO_PERMISSION = 101;
 }
