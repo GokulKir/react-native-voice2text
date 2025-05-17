@@ -10,6 +10,7 @@ import android.speech.SpeechRecognizer
 import androidx.core.app.ActivityCompat
 import com.facebook.react.bridge.*
 import com.facebook.react.modules.core.DeviceEventManagerModule
+import java.util.*
 
 class Voice2TextModule(reactContext: ReactApplicationContext) :
     ReactContextBaseJavaModule(reactContext), RecognitionListener {
@@ -22,7 +23,7 @@ class Voice2TextModule(reactContext: ReactApplicationContext) :
 
     private fun initializeRecognizer() {
         if (isDestroyed) return
-        
+
         mainHandler.post {
             try {
                 if (speechRecognizer == null) {
@@ -54,7 +55,7 @@ class Voice2TextModule(reactContext: ReactApplicationContext) :
     @ReactMethod
     fun checkPermissions(promise: Promise) {
         val granted = ActivityCompat.checkSelfPermission(
-            reactApplicationContext, 
+            reactApplicationContext,
             Manifest.permission.RECORD_AUDIO
         ) == PackageManager.PERMISSION_GRANTED
         promise.resolve(granted)
@@ -63,7 +64,7 @@ class Voice2TextModule(reactContext: ReactApplicationContext) :
     @ReactMethod
     fun startListening(languageCode: String?, promise: Promise) {
         initializeRecognizer()
-        
+
         mainHandler.post {
             try {
                 val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
@@ -117,7 +118,6 @@ class Voice2TextModule(reactContext: ReactApplicationContext) :
         }
     }
 
-    // RecognitionListener Callbacks
     override fun onReadyForSpeech(params: Bundle?) {
         sendEvent("onSpeechBegin", null)
     }
@@ -168,7 +168,6 @@ class Voice2TextModule(reactContext: ReactApplicationContext) :
         }
     }
 
-    // Other unused callbacks
     override fun onBufferReceived(buffer: ByteArray?) {}
     override fun onEvent(eventType: Int, params: Bundle?) {}
 
