@@ -1,13 +1,16 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- Permission to record audio -->
+    <!-- Required Permissions -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.INTERNET" />
 
+    <!-- Required to use Android's SpeechRecognizer service -->
+    <queries>
+        <intent>
+            <action android:name="android.speech.RecognitionService" />
+        </intent>
+    </queries>
 
-    <!-- Required inside manifest, even if empty -->
-    <application>
-        <!-- Your app components go here, e.g. activities -->
-    </application>
-
+    <!-- Even though libraries often don't define their own <application>, keep a placeholder -->
+    <application />
 </manifest>
