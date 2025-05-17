@@ -11,6 +11,5 @@
         </intent>
     </queries>
 
-    <!-- Even though libraries often don't define their own <application>, keep a placeholder -->
     <application />
 </manifest>
