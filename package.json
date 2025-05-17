@@ -1,6 +1,6 @@
 {
   "name": "react-native-voice2text",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "react-native-voice2text is a lightweight and easy-to-use React Native module for Android that converts spoken words into text using native speech recognition. Compatible with React Native 0.70+ (including 0.79), it offers a simple API to add voice-to-text capabilities to your app for hands-free input, voice commands, or accessibility. iOS support coming soon.",
   "main": "./lib/module/index.js",
   "types": "./lib/typescript/src/index.d.ts",

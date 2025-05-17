@@ -1,8 +1,9 @@
 package com.voice2text
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
-import android.os.Bundle
+import android.os.*
 import android.speech.RecognitionListener
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
@@ -14,8 +15,10 @@ import java.util.*
 class Voice2TextModule(reactContext: ReactApplicationContext) :
     ReactContextBaseJavaModule(reactContext), RecognitionListener {
 
-    private val speechRecognizer: SpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(reactContext)
+    private val speechRecognizer: SpeechRecognizer =
+        SpeechRecognizer.createSpeechRecognizer(reactContext)
     private val reactContext: ReactApplicationContext = reactContext
+    private val mainHandler = Handler(Looper.getMainLooper())
 
     init {
         speechRecognizer.setRecognitionListener(this)
@@ -24,7 +27,8 @@ class Voice2TextModule(reactContext: ReactApplicationContext) :
     override fun getName(): String = "Voice2Text"
 
     private fun sendEvent(eventName: String, params: WritableMap?) {
-        reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
+        reactContext
+            .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
             .emit(eventName, params)
     }
 
@@ -38,50 +42,60 @@ class Voice2TextModule(reactContext: ReactApplicationContext) :
 
     @ReactMethod
     fun startListening(languageCode: String?, promise: Promise) {
-        val intent = RecognizerIntent().apply {
-            action = RecognizerIntent.ACTION_RECOGNIZE_SPEECH
-            putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+        val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+            putExtra(
+                RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
+            )
             putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
-
-            val lang = if (languageCode.isNullOrEmpty()) Locale.getDefault().toLanguageTag() else languageCode
+            val lang =
+                if (languageCode.isNullOrEmpty()) Locale.getDefault().toLanguageTag() else languageCode
             putExtra(RecognizerIntent.EXTRA_LANGUAGE, lang)
         }
 
-        try {
-            speechRecognizer.startListening(intent)
-            promise.resolve(true)
-        } catch (e: Exception) {
-            promise.reject("START_FAILED", e.message)
+        mainHandler.post {
+            try {
+                speechRecognizer.startListening(intent)
+                promise.resolve(true)
+            } catch (e: Exception) {
+                promise.reject("START_FAILED", e.message)
+            }
         }
     }
 
     @ReactMethod
     fun stopListening(promise: Promise) {
-        try {
-            speechRecognizer.stopListening()
-            promise.resolve(true)
-        } catch (e: Exception) {
-            promise.reject("STOP_FAILED", e.message)
+        mainHandler.post {
+            try {
+                speechRecognizer.stopListening()
+                promise.resolve(true)
+            } catch (e: Exception) {
+                promise.reject("STOP_FAILED", e.message)
+            }
         }
     }
 
     @ReactMethod
     fun cancelListening(promise: Promise) {
-        try {
-            speechRecognizer.cancel()
-            promise.resolve(true)
-        } catch (e: Exception) {
-            promise.reject("CANCEL_FAILED", e.message)
+        mainHandler.post {
+            try {
+                speechRecognizer.cancel()
+                promise.resolve(true)
+            } catch (e: Exception) {
+                promise.reject("CANCEL_FAILED", e.message)
+            }
         }
     }
 
     @ReactMethod
     fun destroy(promise: Promise) {
-        try {
-            speechRecognizer.destroy()
-            promise.resolve(true)
-        } catch (e: Exception) {
-            promise.reject("DESTROY_FAILED", e.message)
+        mainHandler.post {
+            try {
+                speechRecognizer.destroy()
+                promise.resolve(true)
+            } catch (e: Exception) {
+                promise.reject("DESTROY_FAILED", e.message)
+            }
         }
     }
 
@@ -116,18 +130,20 @@ class Voice2TextModule(reactContext: ReactApplicationContext) :
     }
 
     override fun onResults(results: Bundle?) {
-        val matches = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
+        val matches: ArrayList<String>? =
+            results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
         val map = Arguments.createMap()
         map.putString("text", matches?.getOrNull(0) ?: "")
-        map.putArray("alternatives", Arguments.fromList(matches ?: emptyList()))
+        map.putArray("alternatives", Arguments.fromList(matches ?: emptyList<String>()))
         sendEvent("onSpeechResults", map)
     }
 
     override fun onPartialResults(partialResults: Bundle?) {
-        val partial = partialResults?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
+        val partial: ArrayList<String>? =
+            partialResults?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
         val map = Arguments.createMap()
         map.putString("partialText", partial?.getOrNull(0) ?: "")
-        map.putArray("alternatives", Arguments.fromList(partial ?: emptyList()))
+        map.putArray("alternatives", Arguments.fromList(partial ?: emptyList<String>()))
         sendEvent("onSpeechPartialResults", map)
     }
 
